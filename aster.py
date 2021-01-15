@@ -94,20 +94,46 @@ class MongoInformation(object):
             return self.client.mclient[dbname].list_collection_names()
 
 
+class Mongoose(object):
+    """
+    facade design pattern
+    """
+
+    def __init__(self, host=None, port=27010, maxPoolSize=50, dbname=None, collectionName=None):
+        # creates an instance of settings class
+        self._settings = Settings(host=host, port=port, maxPoolSize=maxPoolSize)
+        # creates a single instance of client object
+        self.client = Client(_settings=self._settings)
+        self.dbname = dbname
+        self.collectionName = collectionName
+
+        self.insert = MongoInsert(_client=self.client, dbName=self.dbname, collectionName=self.collectionName)
+
+    def insert_one_record(self, record={}):
+        return self.insert.insert_one(record=record)
+
+
+# def main():
+#     url = "mongodb://localhost:27017"
+#     # Creates an instance of the settings class
+#     _settings = Settings(host=url)
+#
+#     # Creates a single instance of client object
+#     _client = Client(_settings=_settings)
+#
+#     _record = {"name": "indranil"}
+#     dbname = "testeverything"
+#     collectionName = "person"
+#
+#     _helper = MongoInsert(_client=_client, dbName=dbname, collectionName=collectionName)
+#     res = _helper.insert_one(record=_record)
+#     print(res)
+
 def main():
-    url = "mongodb://localhost:27017"
-    # Creates an instance of the settings class
-    _settings = Settings(host=url)
+    _helper = Mongoose(host="mongodb://localhost:27017", dbname="testeverything", collectionName="person")
 
-    # Creates a single instance of client object
-    _client = Client(_settings=_settings)
-
-    _record = {"name": "indranil"}
-    dbname = "testeverything"
-    collectionName = "person"
-
-    _helper = MongoInsert(_client=_client, dbName=dbname, collectionName=collectionName)
-    res = _helper.insert_one(record=_record)
+    _record = {"name": "Newton"}
+    res = _helper.insert.insert_one(record=_record)
     print(res)
 
 
